@@ -7,6 +7,8 @@ const blogsRouter = require('./controllers/blogs');
 const config = require('./utils/config');
 
 const mongoUrl = config.MONGODB_URI;
+console.log('ENV IS :',process.env.NODE_ENV);
+console.log("mongo url is :",mongoUrl)
 mongoose.connect(mongoUrl)
   .then(() => console.log('successfully connected to db'))
   .catch(() => console.log('error while connecting'));
