@@ -13,7 +13,7 @@ beforeAll(async () => {
   await Promise.all(promiseArray);
 }, 20000);
 
-describe('get /api/blogs',() => {
+describe('get /api/blogs', () => {
   test('notes are returned as json', async () => {
     const response = await api
       .get('/api/blogs')
@@ -21,33 +21,45 @@ describe('get /api/blogs',() => {
       .expect('Content-Type', /application\/json/);
     expect(response.body).toHaveLength(6);
   }, 20000);
-  
+
   test('verify that unique identifier property of the blog posts is named id', async () => {
     const response = await api.get('/api/blogs');
     response.body.forEach((blog) => {
       expect(blog.id).toBeDefined();
     });
   });
-  
+});
 
-})
+describe('post /api/blogs', () => {
+  test('POST request successfully creates a new blog post', async () => {
+    const newBlog = {
+      title: 'new blog for testing',
+      author: 'Robert',
+      url: 'http://blog.cleancoder.com/uncle-bob/',
+      likes: 2,
+    };
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(201);
+    const response = await api.get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+    expect(response.body).toHaveLength(helper.initialBlogs.length + 1);
+    const content = response.body.map((b) => b.title);
+    expect(content).toContain(newBlog.title);
+  });
 
-test('POST request successfully creates a new blog post', async () => {
-  const newBlog = {
-    title: 'new blog for testing',
-    author: 'Robert',
-    url: 'http://blog.cleancoder.com/uncle-bob/',
-    likes: 2,
-  };
-  await api.post('/api/blogs')
-    .send(newBlog)
-    .expect(201);
-  const response = await api.get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/);
-  expect(response.body).toHaveLength(helper.initialBlogs.length + 1);
-  const content = response.body.map((b)=>b.title)
-  expect(content).toContain(newBlog.title);
+  test('if request made with no likes, likes is set to 0',async () => {
+    const blogWithNoLikes = {
+      title: 'blog with no likes',
+      author: 'Robert',
+      url: 'http://blog.cleancoder.com/uncle-bob/',
+    };
+    const response = await api.post('/api/blogs')
+      .send(blogWithNoLikes)
+      .expect(201);
+    expect(response.body.likes).toBe(0);
+  });
 });
 
 afterAll(async () => {
