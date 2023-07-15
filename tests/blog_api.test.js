@@ -26,8 +26,8 @@ describe('get /api/blogs', () => {
     const response = await api.get('/api/blogs');
     response.body.forEach((blog) => {
       expect(blog.id).toBeDefined();
-    });
-  });
+    }); 
+});
 });
 
 describe('post /api/blogs', () => {
@@ -76,6 +76,45 @@ describe('post /api/blogs', () => {
     await api.post('/api/blogs')
       .send(blogWithNoTitle)
       .expect(400);
+  });
+});
+
+describe('delete /api/blogs/:id', () => {
+  beforeAll(async () => {
+    await Blog.deleteMany({});
+    const blogObjects = helper.initialBlogs.map((b) => new Blog(b));
+    const promiseArray = blogObjects.map((b) => b.save());
+    await Promise.all(promiseArray);
+  }, 20000);
+
+  test('deleting an element reduces length of blogs by', async () => {
+    let response = await api.get('/api/blogs')
+      .expect(200);
+    await api.delete(`/api/blogs/${response.body[0].id}`)
+      .expect(200);
+    response = await api.get('/api/blogs')
+      .expect(200);
+    expect(response.body).toHaveLength(helper.initialBlogs.length - 1);
+  });
+});
+
+describe('put /api/blogs/:id', () => {
+  beforeAll(async () => {
+    await Blog.deleteMany({});
+    const blogObjects = helper.initialBlogs.map((b) => new Blog(b));
+    const promiseArray = blogObjects.map((b) => b.save());
+    await Promise.all(promiseArray);
+  }, 20000);
+
+  test('updating likes returnes updated like', async () => {
+    let response = await api.get('/api/blogs')
+      .expect(200);
+    await api.put(`/api/blogs/${response.body[0].id}`)
+    .send({likes:10})
+      .expect(200);
+    response = await api.get('/api/blogs')
+      .expect(200);
+    
   });
 });
 
