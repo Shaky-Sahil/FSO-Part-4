@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 require('express-async-errors');
 const blogsRouter = require('./controllers/blogs');
 const config = require('./utils/config');
+const userRouter = require('./controllers/users');
 
 app.use(cors());
 app.use(express.json());
@@ -16,5 +17,6 @@ mongoose.connect(mongoUrl)
   .catch(() => console.log('error while connecting'));
 
 app.use('/api/blogs', blogsRouter);
+app.use('/api/users', userRouter);
 
 module.exports = app;
