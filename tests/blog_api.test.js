@@ -31,6 +31,12 @@ describe('get /api/blogs', () => {
 });
 
 describe('post /api/blogs', () => {
+  beforeAll(async () => {
+    await Blog.deleteMany({});
+    const blogObjects = helper.initialBlogs.map((b) => new Blog(b));
+    const promiseArray = blogObjects.map((b) => b.save());
+    await Promise.all(promiseArray);
+  }, 20000);
   test('POST request successfully creates a new blog post', async () => {
     const newBlog = {
       title: 'new blog for testing',

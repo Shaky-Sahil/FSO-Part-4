@@ -19,4 +19,14 @@ mongoose.connect(mongoUrl)
 app.use('/api/blogs', blogsRouter);
 app.use('/api/users', userRouter);
 
+app.use((err, req, res, next) => {
+  console.log("error message is :");
+  console.log(err.message);
+  if (err.errors.username.kind === 'unique') {
+    res.status(400);
+    res.json({ error: 'username is already taken' });
+  }
+  next(err);
+});
+
 module.exports = app;
